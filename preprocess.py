@@ -100,7 +100,19 @@ def remove_weather(data, weather):
     return data[np.abs(data[:, 6].astype(np.float)) != weather]
 
 
+def remove_records_before_date(data, limit_date):
+    limit_date_typed = datetime.datetime.strptime(limit_date, "%Y-%m-%d %H:%M:%S")
+    for r in data:
+        parsed_date = datetime.datetime.strptime(r[0], "%Y-%m-%d %H:%M:%S")
+
+        if parsed_date < limit_date_typed:
+            r[0] = limit_date
+
+    return data[(data[:, 0].astype(np.str)) != limit_date]
+
+
 def prepare_data_set(data: np.array) -> (np.array, list):
+    data = remove_records_before_date(data, '2011-04-01 00:00:00')
     data_processed, header = extract_date_time(data, SCHEMA_DESC)
 
     data_processed = round_numbers(data_processed, 7)

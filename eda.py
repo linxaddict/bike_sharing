@@ -1,6 +1,6 @@
 import numpy as np
 from sklearn import linear_model
-from sklearn.ensemble import RandomForestRegressor
+from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
 from sklearn.model_selection import cross_val_score
 from sklearn.tree import DecisionTreeRegressor
 
@@ -28,13 +28,14 @@ def main():
         print('regression: ')
 
         models = {
-            # 'linear_regression': linear_model.LinearRegression(),
-            # 'linear_ridge': linear_model.Ridge(),
-            # 'lasso': linear_model.Lasso(),
-            # 'elastic_net': linear_model.ElasticNet(),
-            # 'bayesian_ridge': linear_model.BayesianRidge(),
-            # 'decision_tree': DecisionTreeRegressor(max_depth=5),
-            'random_forest': RandomForestRegressor()
+            'linear_regression': linear_model.LinearRegression(),
+            'linear_ridge': linear_model.Ridge(),
+            'lasso': linear_model.Lasso(),
+            'elastic_net': linear_model.ElasticNet(),
+            'bayesian_ridge': linear_model.BayesianRidge(),
+            'decision_tree': DecisionTreeRegressor(max_depth=5),
+            'random_forest': RandomForestRegressor(random_state=1),
+            'gradient_boosting': GradientBoostingRegressor(n_estimators=200, alpha=0.01, max_depth=5, loss='lad')
         }
 
         for name, model in models.items():
@@ -62,11 +63,12 @@ def main():
 
             predicted = model.predict(sliced_data)
             output = np.c_[data, predicted]
-            header.append('predict')
-
-            write_csv('output.csv', output, header)
 
             print()
+
+        header.append('predict')
+
+        write_csv('output.csv', output, header)
     except FileNotFoundError:
         print('cannot open file for reading: ', file)
 
