@@ -134,7 +134,8 @@ def prepare_data_set(data: np.array) -> (np.array, list):
 
 def divide_dataset(sliced_data, header) -> (np.array, np.array, np.array, np.array):
     data_train, data_test, target_train, target_test = train_test_split(sliced_data, header, test_size=0.2)
-    write_csv('test_data.csv', target_test, 'test data')
+    write_csv('test_data.csv', data_test, ['month', 'week_day', 'hour', 'season', 'holiday', 'workingday', 'weather',
+                                           'temp', 'humidity', 'windspeed'])
     return data_train, data_test, target_train, target_test
 
 
