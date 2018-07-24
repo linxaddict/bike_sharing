@@ -1,11 +1,21 @@
+import pickle
+
 import numpy as np
-from sklearn import linear_model
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import median_absolute_error
 from sklearn.model_selection import cross_val_score
-from sklearn.tree import DecisionTreeRegressor
 
 from preprocess import load_data_set, prepare_data_set, write_csv, divide_dataset
+
+
+def serialize_model(model, filename):
+    with open(filename, 'wb') as handle:
+        pickle.dump(model, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+
+def deserialize_model(filename):
+    with open(filename, 'rb') as handle:
+        return pickle.load(handle)
 
 
 def main():
@@ -31,12 +41,12 @@ def main():
         print('regression: ')
 
         models = {
-            'linear_regression': linear_model.LinearRegression(),
-            'linear_ridge': linear_model.Ridge(),
-            'lasso': linear_model.Lasso(),
-            'elastic_net': linear_model.ElasticNet(),
-            'bayesian_ridge': linear_model.BayesianRidge(),
-            'decision_tree': DecisionTreeRegressor(max_depth=5),
+            # 'linear_regression': linear_model.LinearRegression(),
+            # 'linear_ridge': linear_model.Ridge(),
+            # 'lasso': linear_model.Lasso(),
+            # 'elastic_net': linear_model.ElasticNet(),
+            # 'bayesian_ridge': linear_model.BayesianRidge(),
+            # 'decision_tree': DecisionTreeRegressor(max_depth=5),
             'random_forest': RandomForestRegressor(random_state=1),
             # 'gradient_boosting': GradientBoostingRegressor(n_estimators=200, alpha=0.01, max_depth=5, loss='lad')
         }
@@ -67,7 +77,9 @@ def main():
             scores = cross_val_score(model, data_train, target_train.ravel(), scoring='r2', cv=10)
             print('r2', scores.mean())
 
-            model.fit(data_test, target_test.ravel())
+            serialize_model(model, 'random_forest.pickle')
+
+            # model.fit(data_test, target_test.ravel())
             predicted = model.predict(data_test)
 
             print('[test] neg median absolute error: ', median_absolute_error(target_test, predicted))
@@ -86,3 +98,9 @@ def main():
 
 
 main()
+
+model = deserialize_model('random_forest.pickle')
+data = np.array([[12.0, 4.0, 21.0, 4.0, 0.0, 1.0, 1.0, 12.0, 75.0, 11.0]])
+print('predict: ', model.predict(data))
+
+print('model: ', model)
